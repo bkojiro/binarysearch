@@ -3,8 +3,8 @@
 
 using namespace std;
 
-Node::Node(int a) {
-  value = a;
+Node::Node() {
+  value = 0;
   left = NULL;
   right = NULL;
 }

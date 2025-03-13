@@ -7,7 +7,7 @@ using namespace std;
 
 class Node {
  public:
-  Node(int a);
+  Node();
   ~Node();
   Node* getLeft();
   Node* getRight();

@@ -7,9 +7,11 @@ using namespace std;
 
 void insert(Node* &current, int a);
 void print(Node* current, int depth);
+void search(Node* current, int x);
+void remove(Node* current, Node* root, int x);
 
 int main() {
-  Node* root;
+  Node* root = new Node();
   bool active = true;
   while(active) {
     cout << "Enter INSERT, REMOVE, PRINT, SEARCH, or QUIT" << endl << "> ";
@@ -40,22 +42,26 @@ int main() {
 	int x;
 	while (numbers >> x) {
 	  //insert x into tree
-	  if (root->getValue() == 0) {
-	    root->setValue(x);
-	  } else {
-	    insert(root, x);
-	  }
+	  insert(root, x);
 	}
       }
     } else if (strcmp(action, "REMOVE") == 0) {
       //remove a number covering the three cases + deleting root
-      
+      cout << "What number would you like to remove?" << endl << "> ";
+      int x;
+      cin >> x;
+      cin.ignore();
+      remove(root, root, x);
     } else if (strcmp(action, "PRINT") == 0) {
       //visualization of tree
       print(root, 0);
     } else if (strcmp(action, "SEARCH") == 0) {
       //see if tree has a number
-      
+      cout << "What number would you like to search for?" << endl << "> ";
+      int x;
+      cin >> x;
+      cin.ignore();
+      search(root, x);
     } else if (strcmp(action, "QUIT") == 0) {
       //terminate program
       active = false;
@@ -65,21 +71,27 @@ int main() {
 }
 
 void insert(Node* &current, int a) {
-  if (a >= current->getValue()) {
+  if (current->getValue() == 0) {
+    current->setValue(a);
+  } else if (a >= current->getValue()) {
     //go to right if greater/equal to current
     if (current->getRight() != NULL) {
-      current = current->getRight();
-      insert(current, a);
+      Node* right = current->getRight();
+      insert(right, a);
     } else {
-      current->setRight(new Node(a));
+      Node* temp = new Node();
+      temp->setValue(a);
+      current->setRight(temp);
     }
   } else if (a < current->getValue()) {
     //go to left!
     if (current->getLeft() != NULL) {
-      current = current->getLeft();
-      insert(current, a);
+      Node* left = current->getLeft();
+      insert(left, a);
     } else {
-      current->setLeft(new Node(a));
+      Node* temp = new Node();
+      temp->setValue(a);
+      current->setLeft(temp);
     }
   }
 }
@@ -93,7 +105,42 @@ void print(Node* current, int depth) {
   }
   cout << current->getValue() << endl;
   if (current->getLeft() != NULL) {
-    cout << "worked";
     print(current->getLeft(), depth + 1);
+  }
+}
+
+void search(Node* current, int x) {
+  if (current != NULL) { 
+    if (current->getValue() == x) {
+      cout << "Number found" << endl;
+    } else if (x >= current->getValue()) {
+      search(current->getRight(), x);
+    } else if (x < current->getValue()) {
+      search(current->getLeft(), x);
+    }
+  } else {
+    cout << "Number not found" << endl;
+  }
+}
+
+void remove(Node* &current, Node* root, int x) {
+  if (current != NULL) {
+    if (current->getValue() == x) {
+      if (current == root) { //replace root with next highest
+
+      } else if (current->getRight() != NULL && current->getLeft() != NULL) { //two children!
+
+      } else { //one child
+        if (current->getRight() != NULL) {
+          current = current->getRight();
+        }
+      } 
+    } else if (x >= current->getValue()) {
+      remove(current->getRight(), x);
+    } else if (x < current->getValue()) {
+      search(current->getLeft(), x);
+    }
+  } else {
+    cout << "Number not found" << endl;
   }
 }
