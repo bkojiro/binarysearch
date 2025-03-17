@@ -8,7 +8,7 @@ using namespace std;
 void insert(Node* &current, int a);
 void print(Node* current, int depth);
 void search(Node* current, int x);
-void remove(Node* current, Node* root, int x);
+void remove(Node* &current, Node* root, int x);
 
 int main() {
   Node* root = new Node();
@@ -124,23 +124,34 @@ void search(Node* current, int x) {
 }
 
 void remove(Node* &current, Node* root, int x) {
-  if (current != NULL) {
-    if (current->getValue() == x) {
-      if (current == root) { //replace root with next highest
-
-      } else if (current->getRight() != NULL && current->getLeft() != NULL) { //two children!
-
-      } else { //one child
-        if (current->getRight() != NULL) {
-          current = current->getRight();
-        }
-      } 
-    } else if (x >= current->getValue()) {
-      remove(current->getRight(), x);
-    } else if (x < current->getValue()) {
-      search(current->getLeft(), x);
+  if (current != NULL) { //make sure there is something to delete
+    if (current->getValue() == x && current == root) { //remove the root!
+      
+    } else {
+      Node* next = current->getRight(); //check right
+      if (next != NULL) {
+	if (next->getValue() == x) { //remove right child
+	  if (next->getRight() != NULL) { //replace next with next's left
+	    Node* replace = next->getRight();
+            while (replace->getLeft() != NULL) {
+              replace = replace->getLeft();
+            }
+            replace->setLeft(next->getLeft());
+            replace->setRight(next->getRight());
+            current->setRight(replace);
+	    //delete replace
+            delete next;
+	  } else if (next->getLeft() != NULL) { //only left
+	    current->setRight(next->getLeft());
+	    delete next;
+	  } else { //next has no children
+	    current->setRight(NULL);
+	    delete next;
+	  }
+	}
+      }
+      next = current->getLeft(); //check left
+      
     }
-  } else {
-    cout << "Number not found" << endl;
   }
 }
