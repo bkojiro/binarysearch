@@ -8,7 +8,7 @@ using namespace std;
 void insert(Node* &current, int a);
 void print(Node* current, int depth);
 void search(Node* current, int x);
-void remove(Node* &current, Node* root, int x);
+void remove(Node* &current, int x);
 
 int main() {
   Node* root = new Node();
@@ -51,7 +51,34 @@ int main() {
       int x;
       cin >> x;
       cin.ignore();
-      remove(root, root, x);
+      if (root->getValue() == x) { //delete the root!
+	if (root->getRight() != NULL) { //use next biggest
+	  Node* temp = root->getRight();
+	  Node* next = temp;
+	  while (next != NULL && next->getLeft() != NULL) {
+	    temp = next;
+	    next = next->getLeft();
+	  }
+	  next->setLeft(root->getLeft());
+	  if (next != root->getRight()) { //root's right is next biggest
+	    if (next->getRight() != NULL) { //if next biggest has a right child
+	      temp->setLeft(next->getRight());
+	    }
+	    next->setRight(root->getRight());
+	  }
+	  Node* delRoot = root;
+	  root = next;
+	  delete delRoot;
+	} else if (root->getLeft() != NULL) { //use left child if no right
+	  Node* temp = root;
+	  root = root->getLeft();
+	  delete temp;
+	} else { //no children, make root = 0
+	  root->setValue(0);
+	}
+      } else {
+        remove(root, x);
+      }
     } else if (strcmp(action, "PRINT") == 0) {
       //visualization of tree
       print(root, 0);
@@ -71,7 +98,7 @@ int main() {
 }
 
 void insert(Node* &current, int a) {
-  if (current->getValue() == 0) {
+  if (current->getValue() == 0) { //insert at root
     current->setValue(a);
   } else if (a >= current->getValue()) {
     //go to right if greater/equal to current
@@ -123,35 +150,31 @@ void search(Node* current, int x) {
   }
 }
 
-void remove(Node* &current, Node* root, int x) {
+void remove(Node* &current, int x) {
   if (current != NULL) { //make sure there is something to delete
-    if (current->getValue() == x && current == root) { //remove the root!
-      
-    } else {
-      Node* next = current->getRight(); //check right
-      if (next != NULL) {
-	if (next->getValue() == x) { //remove right child
-	  if (next->getRight() != NULL) { //replace next with next's left
-	    Node* replace = next->getRight();
-            while (replace->getLeft() != NULL) {
-              replace = replace->getLeft();
-            }
-            replace->setLeft(next->getLeft());
-            replace->setRight(next->getRight());
-            current->setRight(replace);
-	    //delete replace
-            delete next;
-	  } else if (next->getLeft() != NULL) { //only left
-	    current->setRight(next->getLeft());
-	    delete next;
-	  } else { //next has no children
-	    current->setRight(NULL);
-	    delete next;
+    Node* next = current->getRight(); //check right
+    if (next != NULL) {
+      if (next->getValue() == x) { //remove right child
+	if (next->getRight() != NULL) { //replace next with slightly larger
+	  Node* replace = next->getRight();
+	  while (replace->getLeft() != NULL) {
+	    replace = replace->getLeft();
 	  }
+	  replace->setLeft(next->getLeft());
+	  replace->setRight(next->getRight());
+	  current->setRight(replace);
+	  
+	  delete next;
+	} else if (next->getLeft() != NULL) { //only left
+	  current->setRight(next->getLeft());
+	  delete next;
+	} else { //next has no children
+	  current->setRight(NULL);
+	  delete next;
 	}
       }
-      next = current->getLeft(); //check left
-      
     }
+    next = current->getLeft(); //check left
+    
   }
 }
