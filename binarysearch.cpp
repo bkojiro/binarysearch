@@ -59,16 +59,15 @@ int main() {
 	    temp = next;
 	    next = next->getLeft();
 	  }
-	  next->setLeft(root->getLeft());
-	  if (next != root->getRight()) { //root's right is next biggest
-	    if (next->getRight() != NULL) { //if next biggest has a right child
-	      temp->setLeft(next->getRight());
-	    }
-	    next->setRight(root->getRight());
+	  root->setValue(next->getValue()); //replace root val with replace val
+	  if (root->getRight() == next) {
+	    root->setRight(next->getRight());
+	  } else if (next->getRight() != NULL) { //if next has a right child
+            temp->setLeft(next->getRight());
+          } else { //if next has no children
+	    temp->setLeft(NULL);
 	  }
-	  Node* delRoot = root;
-	  root = next;
-	  delete delRoot;
+	  delete next;
 	} else if (root->getLeft() != NULL) { //use left child if no right
 	  Node* temp = root;
 	  root = root->getLeft();
@@ -151,30 +150,68 @@ void search(Node* current, int x) {
 }
 
 void remove(Node* &current, int x) {
-  if (current != NULL) { //make sure there is something to delete
-    Node* next = current->getRight(); //check right
-    if (next != NULL) {
-      if (next->getValue() == x) { //remove right child
-	if (next->getRight() != NULL) { //replace next with slightly larger
-	  Node* replace = next->getRight();
-	  while (replace->getLeft() != NULL) {
-	    replace = replace->getLeft();
-	  }
-	  replace->setLeft(next->getLeft());
-	  replace->setRight(next->getRight());
-	  current->setRight(replace);
-	  
-	  delete next;
-	} else if (next->getLeft() != NULL) { //only left
-	  current->setRight(next->getLeft());
-	  delete next;
-	} else { //next has no children
-	  current->setRight(NULL);
-	  delete next;
+  //check right
+  Node* check = current->getRight();
+  if (check != NULL) {
+    if (check->getValue() == x) {
+      if (check->getRight() != NULL) { //use next biggest
+	Node* temp = check->getRight();
+	Node* next = temp;
+	while (next != NULL && next->getLeft() != NULL) {
+	  temp = next;
+	  next = next->getLeft();
 	}
+	check->setValue(next->getValue()); //replace root val with replace val
+	if (check->getRight() == next) {
+	  check->setRight(next->getRight());
+	} else if (next->getRight() != NULL) { //if next has a right child
+	  temp->setLeft(next->getRight());
+	} else { //if next has no children
+	  temp->setLeft(NULL);
+	}
+	delete next;
+      } else if (check->getLeft() != NULL) { //use left child if no right
+	Node* temp = check;
+	check = check->getLeft();
+	delete temp;
+      } else { //no children, make root = 0
+	current->setRight(NULL);
+	delete check;
       }
+    } else {
+      remove(check, x);
     }
-    next = current->getLeft(); //check left
-    
+  }
+  //check left
+  check = current->getLeft();
+  if (check != NULL) {    
+    if (check->getValue() == x) {
+      if (check->getRight() != NULL) { //use next biggest
+	Node* temp = check->getRight();
+	Node* next = temp;
+	while (next != NULL && next->getLeft() != NULL) {
+	  temp = next;
+	  next = next->getLeft();
+	}
+	check->setValue(next->getValue()); //replace root val with replace val
+	if (check->getRight() == next) {
+	  check->setRight(next->getRight());
+	} else if (next->getRight() != NULL) { //if next has a right child
+	  temp->setLeft(next->getRight());
+	} else { //if next has no children
+	  temp->setLeft(NULL);
+	}
+	delete next;
+      } else if (check->getLeft() != NULL) { //use left child if no right
+	Node* temp = check;
+	check = check->getLeft();
+	delete temp;
+      } else { //no children, make root = 0
+	current->setLeft(NULL);
+	delete check;
+      }
+    } else {
+      remove(check, x);
+    }
   }
 }
